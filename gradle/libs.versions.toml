@@ -16,7 +16,7 @@ retrofitVersion = "2.11.0"
 retrofit = "2.11.0"
 kotlinxSerialization = "1.6.3"
 roomKtx = "2.6.1"
-ksp = "2.0.0-1.0.21"
+ksp = "1.9.23-1.0.20"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

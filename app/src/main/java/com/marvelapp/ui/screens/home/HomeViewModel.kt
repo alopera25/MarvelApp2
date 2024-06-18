@@ -13,14 +13,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val repository: CharacterRepository
+) : ViewModel() {
 
     private var offset = 0
     private val limit = 18
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> get() = _state.asStateFlow()
 
-    private val repository = CharacterRepository(CharacterRemoteDataSource())
+
 
     fun onUiReady() {
         if (_state.value.characters.isEmpty()) {

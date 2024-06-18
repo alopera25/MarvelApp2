@@ -3,6 +3,7 @@ package com.marvelapp
 import android.app.Application
 import androidx.room.Room
 import com.marvelapp.data.datasource.database.CharacterDatabase
+import com.marvelapp.data.datasource.database.Converters
 
 class App : Application() {
 
