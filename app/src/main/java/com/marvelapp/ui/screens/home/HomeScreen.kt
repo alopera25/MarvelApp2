@@ -83,8 +83,6 @@ private fun StartUi(
 ) {
     if (state.loading && state.characters.isEmpty()) {
         LoadingBar(padding)
-    } else if (state.error != null) {
-        ErrorMsg()
     } else {
         LoadApi(padding, state, vm, onClick)
     }
@@ -109,7 +107,7 @@ private fun LoadApi(
             if (index == state.characters.size - 1 && isLoadingMore.not()) {
                 LaunchedEffect(Unit) {
                     isLoadingMore = true
-                    vm.loadMoreCharacters()
+                    vm.onUiReady()
                     isLoadingMore = false
                 }
             }

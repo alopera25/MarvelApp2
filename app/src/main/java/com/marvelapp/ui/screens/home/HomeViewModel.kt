@@ -9,55 +9,38 @@ import com.marvelapp.data.Character
 import com.marvelapp.data.CharacterRepository
 import com.marvelapp.data.datasource.CharacterRemoteDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val repository: CharacterRepository
 ) : ViewModel() {
 
-    private var offset = 0
-    private val limit = 18
-    private val _state = MutableStateFlow(UiState())
-    val state: StateFlow<UiState> get() = _state.asStateFlow()
+    private val uiReady = MutableStateFlow(false)
 
-
+    val state: StateFlow<UiState> = uiReady
+        .filter { it }
+        .flatMapLatest { repository.characters }
+        .map { UiState(characters = it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = UiState(loading = true)
+        )
 
     fun onUiReady() {
-        if (_state.value.characters.isEmpty()) {
-            loadCharacters()
-        }
+        uiReady.value = true
     }
 
-    fun loadMoreCharacters() {
-        offset += limit
-        loadCharacters()
-    }
-
-    private fun loadCharacters() {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(loading = true)
-            val fetchedCharacters = repository.fetchCharacter(offset, limit)
-            if (fetchedCharacters != null) {
-                val updatedCharacters = if (offset == 0) {
-                    fetchedCharacters
-                } else {
-                    _state.value.characters + fetchedCharacters
-                }
-                _state.value = _state.value.copy(loading = false, characters = updatedCharacters)
-            } else {
-                _state.value = _state.value.copy(loading = false, error = "No se pudo cargar más personajes. Verifica tu conexión a internet.")
-            }
-        }
-    }
-    fun initState(characters: List<Character>) {
-        _state.value = UiState(characters = characters)
-    }
     data class UiState(
         val loading: Boolean = false,
-        val characters: List<Character> = emptyList(),
-        val error: String? = null
+        val characters: List<Character> = emptyList()
     )
 
 }
