@@ -1,21 +1,18 @@
 package com.marvelapp.ui.screens.detail
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.marvelapp.data.Character
 import com.marvelapp.data.CharacterRepository
 import com.marvelapp.data.datasource.remote.Comic
 import com.marvelapp.data.datasource.remote.Event
 import com.marvelapp.data.datasource.remote.Serie
-import com.marvelapp.data.datasource.CharacterRemoteDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class DetailViewModel(
     private val repository: CharacterRepository,
@@ -78,3 +75,18 @@ class DetailViewModel(
         message.value = null
     }
 }
+
+class DetailViewModelFactory(
+    private val characterRepository: CharacterRepository,
+    private val id: Int
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return DetailViewModel(characterRepository, id) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+

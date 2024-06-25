@@ -26,7 +26,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.marvelapp.data.Character
 import com.marvelapp.ui.screens.Screen
@@ -49,13 +47,13 @@ import com.marvelapp.ui.screens.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    state: HomeViewModel.UiState,
+    onUiReady: () -> Unit,
     onClick: (Character) -> Unit,
-    vm: HomeViewModel = viewModel()
 ) {
-    val state by vm.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        vm.onUiReady()
+        onUiReady()
     }
     Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -69,7 +67,7 @@ fun HomeScreen(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             contentWindowInsets = WindowInsets.safeDrawing
         ) { padding ->
-            StartUi(state, padding, vm, onClick)
+            StartUi(state, padding, onUiReady, onClick)
         }
     }
 }
@@ -78,13 +76,13 @@ fun HomeScreen(
 private fun StartUi(
     state: HomeViewModel.UiState,
     padding: PaddingValues,
-    vm: HomeViewModel,
+    onUiReady: () -> Unit,
     onClick: (Character) -> Unit
 ) {
     if (state.loading && state.characters.isEmpty()) {
         LoadingBar(padding)
     } else {
-        LoadApi(padding, state, vm, onClick)
+        LoadApi(padding, state, onUiReady, onClick)
     }
 }
 
@@ -92,7 +90,7 @@ private fun StartUi(
 private fun LoadApi(
     padding: PaddingValues,
     state: HomeViewModel.UiState,
-    vm: HomeViewModel,
+    onUiReady: () -> Unit,
     onClick: (Character) -> Unit
 ) {
     var isLoadingMore by remember { mutableStateOf(false) }
@@ -107,7 +105,7 @@ private fun LoadApi(
             if (index == state.characters.size - 1 && isLoadingMore.not()) {
                 LaunchedEffect(Unit) {
                     isLoadingMore = true
-                    vm.onUiReady()
+                    onUiReady()
                     isLoadingMore = false
                 }
             }

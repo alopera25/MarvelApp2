@@ -19,14 +19,16 @@ class CharacterRepository (
                     localDataSource.saveCharacter(it)
                 }
             }
-        emit(characters!!)
+        characters?.let { emit(it) }
+//        emit(characters!!)
     }
 
     fun fetchCharacterById(id: Int): Flow<Character> =
         localDataSource.fetchCharacterById(id).transform { localCharacters ->
             val character = localCharacters
                 ?: characterRemoteDataSource.fetchCharacterById(id).also { localDataSource.saveCharacter(listOf(it!!)) }
-            emit(character!!)
+            character?.let { emit(it) }
+//            emit(character!!)
         }
 
     /*suspend fun fetchCharacter(offset: Int, limit: Int): List<Character> {
