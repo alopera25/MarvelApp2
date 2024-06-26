@@ -12,13 +12,16 @@ class CharacterRepository (
     private val characterRemoteDataSource: CharacterRemoteDataSource,
     private val localDataSource: CharacterLocalDataSource
 ){
-    val characters: Flow<List<Character>> = localDataSource.characters.transform{ localCharacters ->
-        val characters = localCharacters.takeIf { it.isNotEmpty() }
-            ?: characterRemoteDataSource.fetchCharacter(0,20).also {
-                if (it != null) {
-                    localDataSource.saveCharacter(it)
+    val characters: Flow<List<Character>> = localDataSource.characters.transform { localCharacters ->
+        val characters = if (localCharacters.isNotEmpty()) {
+            localCharacters
+        } else {
+            characterRemoteDataSource.fetchCharacter(0, 18)?.also { fetchedCharacters ->
+                if (fetchedCharacters != null) {
+                    localDataSource.saveCharacter(fetchedCharacters)
                 }
             }
+<<<<<<< Updated upstream
         emit(characters!!)
     }
 
@@ -34,15 +37,21 @@ class CharacterRepository (
             val character = characterRemoteDataSource.fetchCharacter(offset, limit)
             if (character != null) {
                 localDataSource.saveCharacter(character)
-            }
+=======
         }
-        return localDataSource.fetchCharacter()
+        characters?.let { emit(it) }
     }
 
-    suspend fun fetchCharacterById(characterId: Int): Character {
-        return checkNotNull(localDataSource.fetchCharacterById(characterId))
-    }
-    */
+    fun fetchCharacterById(id: Int): Flow<Character> =
+        localDataSource.fetchCharacterById(id).transform { localCharacter ->
+            val character = localCharacter ?: characterRemoteDataSource.fetchCharacterById(id)?.also { fetchedCharacter ->
+                if (fetchedCharacter != null) {
+                    localDataSource.saveCharacter(listOf(fetchedCharacter))
+                }
+>>>>>>> Stashed changes
+            }
+            character?.let { emit(it) }
+        }
 
     suspend fun fetchComicDetails(comicId: Int): Comic? = characterRemoteDataSource.fetchComicDetails(comicId)
 

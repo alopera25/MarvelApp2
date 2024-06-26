@@ -792,7 +792,7 @@ public class LibrariesForLibsInPluginsBlock extends AbstractExternalDependencyFa
             public Provider<String> getKotlinxSerialization() { return getVersion("kotlinxSerialization"); }
 
             /**
-             * Returns the version associated to this alias: ksp (2.0.0-1.0.21)
+             * Returns the version associated to this alias: ksp (1.9.23-1.0.20)
              * If the version is a rich version and that its not expressible as a
              * single version string, then an empty string is returned.
              * This version was declared in catalog libs.versions.toml
