@@ -15,6 +15,7 @@ import com.marvelapp.data.datasource.CharacterRemoteDataSource
 import com.marvelapp.ui.screens.detail.DetailScreen
 import com.marvelapp.ui.screens.detail.DetailViewModel
 import com.marvelapp.ui.screens.home.HomeScreen
+import com.marvelapp.ui.screens.home.HomeViewModel
 import com.marvelapp.ui.screens.splash.SplashScreen
 import com.marvelapp.ui.screens.splash.SplashViewModel
 
@@ -23,12 +24,10 @@ fun Navigation() {
     val navController = rememberNavController()
     val app = LocalContext.current.applicationContext as App
 
-    val characterRepository = remember {
-        CharacterRepository(
-            CharacterRemoteDataSource(),
-            CharacterLocalDataSource(app.db.characterDao()),
-        )
-    }
+    val characterRepository = CharacterRepository(
+        CharacterRemoteDataSource(),
+        CharacterLocalDataSource(app.db.characterDao()),
+    )
 
     NavHost(navController = navController, startDestination = Splash) {
         composable<Splash> {
@@ -37,9 +36,12 @@ fun Navigation() {
         }
 
         composable<Home> {
-            HomeScreen(onClick = { character ->
+            HomeScreen(
+                onClick = { character ->
                 navController.navigate(Detail(character.id!!))
-            })
+            },
+                viewModel { HomeViewModel(characterRepository) }
+            )
         }
 
         composable<Detail> { backStackEntry ->

@@ -12,37 +12,28 @@ class CharacterRepository (
     private val characterRemoteDataSource: CharacterRemoteDataSource,
     private val localDataSource: CharacterLocalDataSource
 ){
-    val characters: Flow<List<Character>> = localDataSource.characters.transform{ localCharacters ->
-        val characters = localCharacters.takeIf { it.isNotEmpty() }
-            ?: characterRemoteDataSource.fetchCharacter(0,20).also {
-                if (it != null) {
-                    localDataSource.saveCharacter(it)
+    val characters: Flow<List<Character>> = localDataSource.characters.transform { localCharacters ->
+        val characters = if (localCharacters.isNotEmpty()) {
+            localCharacters
+        } else {
+            characterRemoteDataSource.fetchCharacter(0, 20)?.also { fetchedCharacters ->
+                if (fetchedCharacters != null) {
+                    localDataSource.saveCharacter(fetchedCharacters)
                 }
             }
-        emit(characters!!)
+        }
+        characters?.let { emit(it) }
     }
 
     fun fetchCharacterById(id: Int): Flow<Character> =
-        localDataSource.fetchCharacterById(id).transform { localCharacters ->
-            val character = localCharacters
-                ?: characterRemoteDataSource.fetchCharacterById(id).also { localDataSource.saveCharacter(listOf(it!!)) }
-            emit(character!!)
-        }
-
-    /*suspend fun fetchCharacter(offset: Int, limit: Int): List<Character> {
-        if (localDataSource.isEmpty()) {
-            val character = characterRemoteDataSource.fetchCharacter(offset, limit)
-            if (character != null) {
-                localDataSource.saveCharacter(character)
+        localDataSource.fetchCharacterById(id).transform { localCharacter ->
+            val character = localCharacter ?: characterRemoteDataSource.fetchCharacterById(id)?.also { fetchedCharacter ->
+                if (fetchedCharacter != null) {
+                    localDataSource.saveCharacter(listOf(fetchedCharacter))
+                }
             }
+            character?.let { emit(it) }
         }
-        return localDataSource.fetchCharacter()
-    }
-
-    suspend fun fetchCharacterById(characterId: Int): Character {
-        return checkNotNull(localDataSource.fetchCharacterById(characterId))
-    }
-    */
 
     suspend fun fetchComicDetails(comicId: Int): Comic? = characterRemoteDataSource.fetchComicDetails(comicId)
 
@@ -50,5 +41,3 @@ class CharacterRepository (
 
     suspend fun fetchEventDetails(eventId: Int): Event? = characterRemoteDataSource.fetchEventDetails(eventId)
 }
-
-

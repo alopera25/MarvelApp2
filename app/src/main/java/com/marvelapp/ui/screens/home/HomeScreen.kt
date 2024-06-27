@@ -50,7 +50,7 @@ import com.marvelapp.ui.screens.Screen
 @Composable
 fun HomeScreen(
     onClick: (Character) -> Unit,
-    vm: HomeViewModel = viewModel()
+    vm: HomeViewModel
 ) {
     val state by vm.state.collectAsState()
 
