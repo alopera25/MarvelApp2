@@ -1,7 +1,8 @@
 package com.marvelapp.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -36,11 +37,15 @@ fun Navigation() {
         }
 
         composable<Home> {
+            val vm = viewModel { HomeViewModel(characterRepository) }
+            val state by vm.state.collectAsState()
+            val fetchNextPage =  vm::fetchNextPage
             HomeScreen(
                 onClick = { character ->
-                navController.navigate(Detail(character.id!!))
-            },
-                viewModel { HomeViewModel(characterRepository) }
+                    navController.navigate(Detail(character.id!!))
+                },
+                fetchNextPage = fetchNextPage,
+                state = state
             )
         }
 

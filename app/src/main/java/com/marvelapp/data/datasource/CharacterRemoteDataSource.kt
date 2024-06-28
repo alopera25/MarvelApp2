@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 class CharacterRemoteDataSource {
 
-    suspend fun fetchCharacter(offset: Int, limit: Int): List<Character>? = withContext(Dispatchers.IO) {
+    suspend fun fetchCharacters(offset: Int, limit: Int): List<Character>? = withContext(Dispatchers.IO) {
         try {
             CharactersClient.instance.fetchCharacter(offset, limit)
                 .data

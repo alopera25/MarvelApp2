@@ -26,11 +26,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.marvelapp.data.Character
 import com.marvelapp.ui.screens.Screen
@@ -50,13 +44,9 @@ import com.marvelapp.ui.screens.Screen
 @Composable
 fun HomeScreen(
     onClick: (Character) -> Unit,
-    vm: HomeViewModel
+    fetchNextPage: () -> Unit,
+    state: HomeViewModel.UiState
 ) {
-    val state by vm.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        vm.onUiReady()
-    }
     Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         Scaffold(
@@ -69,7 +59,7 @@ fun HomeScreen(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             contentWindowInsets = WindowInsets.safeDrawing
         ) { padding ->
-            StartUi(state, padding, vm, onClick)
+            StartUi(state, padding, fetchNextPage, onClick)
         }
     }
 }
@@ -78,13 +68,13 @@ fun HomeScreen(
 private fun StartUi(
     state: HomeViewModel.UiState,
     padding: PaddingValues,
-    vm: HomeViewModel,
+    fetchNextPage: () -> Unit,
     onClick: (Character) -> Unit
 ) {
     if (state.loading && state.characters.isEmpty()) {
         LoadingBar(padding)
     } else {
-        LoadApi(padding, state, vm, onClick)
+        LoadApi(padding, state, fetchNextPage, onClick)
     }
 }
 
@@ -92,10 +82,12 @@ private fun StartUi(
 private fun LoadApi(
     padding: PaddingValues,
     state: HomeViewModel.UiState,
-    vm: HomeViewModel,
+    fetchNextPage: () -> Unit,
     onClick: (Character) -> Unit
 ) {
-    var isLoadingMore by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        fetchNextPage()
+    }
     LazyVerticalGrid(
         columns = GridCells.Adaptive(120.dp),
         contentPadding = padding,
@@ -104,11 +96,9 @@ private fun LoadApi(
         modifier = Modifier.padding(horizontal = 4.dp)
     ) {
         itemsIndexed(state.characters) { index, character ->
-            if (index == state.characters.size - 1 && isLoadingMore.not()) {
+            if (index == state.characters.size - 1) {
                 LaunchedEffect(Unit) {
-                    isLoadingMore = true
-                    vm.onUiReady()
-                    isLoadingMore = false
+                    fetchNextPage()
                 }
             }
             CharacterItem(

@@ -1,6 +1,8 @@
 package com.marvelapp.data.datasource.remote
 
 import com.marvelapp.BuildConfig
+import java.math.BigInteger
+import java.security.MessageDigest
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -9,8 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
-import java.math.BigInteger
-import java.security.MessageDigest
 
 object CharactersClient {
 
@@ -27,7 +27,7 @@ object CharactersClient {
         ignoreUnknownKeys = true
     }
 
-    val instance = Retrofit.Builder()
+    val instance: CharactersService = Retrofit.Builder()
         .baseUrl("https://gateway.marvel.com")
         .client(okHttpClient)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
