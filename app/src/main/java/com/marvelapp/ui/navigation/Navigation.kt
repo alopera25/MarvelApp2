@@ -3,12 +3,14 @@ package com.marvelapp.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.navigation.navArgument
 import com.marvelapp.App
 import com.marvelapp.data.CharacterRepository
 import com.marvelapp.data.datasource.CharacterLocalDataSource
@@ -25,34 +27,39 @@ fun Navigation() {
     val navController = rememberNavController()
     val app = LocalContext.current.applicationContext as App
 
-    val characterRepository = CharacterRepository(
-        CharacterRemoteDataSource(),
-        CharacterLocalDataSource(app.db.characterDao()),
-    )
+    val characterRepository = remember {
+        CharacterRepository(
+            CharacterRemoteDataSource(),
+            CharacterLocalDataSource(app.db.characterDao()),
+        )
+    }
 
-    NavHost(navController = navController, startDestination = Splash) {
-        composable<Splash> {
-            SplashScreen(navController,SplashViewModel()) {
+    NavHost(navController = navController, startDestination = NavScreen.Splash.route) {
+        composable(NavScreen.Splash.route) {
+            SplashScreen(navController, SplashViewModel()) {
             }
         }
 
         composable<Home> {
             val vm = viewModel { HomeViewModel(characterRepository) }
             val state by vm.state.collectAsState()
-            val fetchNextPage =  vm::fetchNextPage
+            val fetchNextPage = vm::fetchNextPage
             HomeScreen(
                 onClick = { character ->
-                    navController.navigate(Detail(character.id!!))
+                    navController.navigate(NavScreen.Detail.createRoute(character.id!!))
                 },
                 fetchNextPage = fetchNextPage,
                 state = state
             )
         }
 
-        composable<Detail> { backStackEntry ->
-            val detail = backStackEntry.toRoute<Detail>()
+        composable(
+            route = NavScreen.Detail.route,
+            arguments = listOf(navArgument(NavArgs.CharacterId.key) { type = NavType.IntType })
+        ) { backStackEntry ->
+            val characterId = requireNotNull(backStackEntry.arguments?.getInt(NavArgs.CharacterId.key))
             DetailScreen(
-                viewModel { DetailViewModel(characterRepository,id) },
+                viewModel { DetailViewModel(characterRepository, characterId) },
                 onBack = { navController.popBackStack() })
         }
     }

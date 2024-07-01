@@ -7,19 +7,15 @@ import com.marvelapp.data.CharacterRepository
 import com.marvelapp.data.datasource.remote.Comic
 import com.marvelapp.data.datasource.remote.Event
 import com.marvelapp.data.datasource.remote.Serie
-import com.marvelapp.data.datasource.CharacterRemoteDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class DetailViewModel(
-    private val repository: CharacterRepository,
-    private val id: Int
+    repository: CharacterRepository,
+    id: Int
 ) : ViewModel() {
 
     private val message = MutableStateFlow<String?>(null)
@@ -42,33 +38,7 @@ class DetailViewModel(
         val message: String? = null
     )
 
-    /*init {
-        fetchCharacterDetails()
-    }
 
-    private fun fetchCharacterDetails() {
-        viewModelScope.launch {
-            _state.value = UiState(loading = true)
-            try {
-                val character = repository.fetchCharacterById(id)
-                _state.value = UiState(loading = false, character = character)
-            } catch (e: Exception) {
-                _state.value = UiState(loading = false, error = "Failed to fetch character details")
-            }
-        }
-    }
-*/
-    suspend fun fetchComicDetails(comicId: Int): Comic? {
-        return repository.fetchComicDetails(comicId)
-    }
-
-    suspend fun fetchSerieDetails(serieId: Int): Serie? {
-        return repository.fetchSerieDetails(serieId)
-    }
-
-    suspend fun fetchEventDetails(serieId: Int): Event? {
-        return repository.fetchEventDetails(serieId)
-    }
 
     fun onFavoriteClicked() {
         message.value = "Favorite Clicked"

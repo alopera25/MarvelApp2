@@ -157,140 +157,22 @@ fun DetailScreen(vm: DetailViewModel, onBack: () -> Unit) {
                         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(character.comics ?: emptyList()) { comic ->
-                            ComicItem(comic, vm)
-                        }
-                    }
 
                     Text(
                         text = "Series: ${character.series?.size ?: 0}",
                         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(character.series ?: emptyList()) { serie ->
-                            SerieItem(serie, vm)
-                        }
-                    }
 
                     Text(
                         text = "Events: ${character.events?.size ?: 0}",
                         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(character.events ?: emptyList()) { event ->
-                            EventItem(event, vm)
-                        }
-                    }
 
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ComicItem(comicSummary: ComicSummary, vm: DetailViewModel) {
-    val comic by produceState<Comic?>(null, comicSummary) {
-        value = vm.fetchComicDetails(comicSummary.resourceURI?.substringAfterLast("/")?.toInt() ?: 0)
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(125.dp)
-            .padding(4.dp)
-    ) {
-        val imageUrl = comic?.thumbnail?.let { "${it.path}.${it.extension}" }
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = comic?.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(MaterialTheme.shapes.small)
-        )
-        Text(
-            text = comic?.title ?: "Loading...",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-    }
-}
-
-
-@Composable
-fun SerieItem(serieSummary: SeriesSummary, vm: DetailViewModel) {
-    val serie by produceState<Serie?>(null, serieSummary) {
-        value =
-            vm.fetchSerieDetails(serieSummary.resourceURI?.substringAfterLast("/")?.toInt() ?: 0)
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(125.dp)
-            .padding(4.dp)
-    ) {
-        val imageUrl = serie?.thumbnail?.let { "${it.path}.${it.extension}" }
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = serie?.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(MaterialTheme.shapes.small)
-        )
-        Text(
-            text = serie?.title ?: "Loading...",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-    }
-}
-
-
-@Composable
-fun EventItem(eventSummary: EventSummary, vm: DetailViewModel) {
-    val event by produceState<Event?>(null, eventSummary) {
-        value =
-            vm.fetchEventDetails(eventSummary.resourceURI?.substringAfterLast("/")?.toInt() ?: 0)
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(125.dp)
-            .padding(4.dp)
-    ) {
-        val imageUrl = event?.thumbnail?.let { "${it.path}.${it.extension}" }
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = event?.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(MaterialTheme.shapes.small)
-        )
-        Text(
-            text = event?.title ?: "Loading...",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
     }
 }
 

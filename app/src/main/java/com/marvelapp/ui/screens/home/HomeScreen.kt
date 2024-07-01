@@ -116,34 +116,6 @@ private fun LoadApi(
 }
 
 @Composable
-private fun ErrorMsg() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "No se pudo cargar más personajes. Verifica tu conexión a internet.",
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun LoadingBar(
     padding: PaddingValues
 ) {
