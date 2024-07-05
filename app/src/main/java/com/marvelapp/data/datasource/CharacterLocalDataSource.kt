@@ -5,7 +5,7 @@ import com.marvelapp.data.datasource.database.CharacterDao
 
 class CharacterLocalDataSource(private val characterDao: CharacterDao) {
 
-    val characters = characterDao.fetchCharacter()
+    val character = characterDao.fetchCharacter()
 
     fun fetchCharacterById(id: Int) =characterDao.fetchCharacterById(id)
 

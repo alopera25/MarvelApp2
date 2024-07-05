@@ -4,29 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marvelapp.data.Character
 import com.marvelapp.data.CharacterRepository
-import com.marvelapp.data.datasource.remote.Comic
-import com.marvelapp.data.datasource.remote.Event
-import com.marvelapp.data.datasource.remote.Serie
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class DetailViewModel(
-    repository: CharacterRepository,
+    private val repository: CharacterRepository,
     id: Int
 ) : ViewModel() {
 
-    private val message = MutableStateFlow<String?>(null)
-    val state: StateFlow<UiState> =
-        combine(repository.fetchCharacterById(id), message) { character, message ->
-            UiState(
-                loading = false,
-                character = character,
-                message = message
-            )
-        }.stateIn(
+    val state: StateFlow<UiState> = repository.fetchCharacterById(id)
+        .map { UiState(character = it) }
+        .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = UiState(loading = true)
@@ -34,17 +25,15 @@ class DetailViewModel(
 
     data class UiState(
         val loading: Boolean = false,
-        val character: Character? = null,
-        val message: String? = null
+        val character: Character? = null
     )
 
-
-
     fun onFavoriteClicked() {
-        message.value = "Favorite Clicked"
+        state.value.character?.let {
+            viewModelScope.launch {
+                repository.toggleFavorite(it)
+            }
+        }
     }
 
-    fun onMessageShown() {
-        message.value = null
-    }
 }
