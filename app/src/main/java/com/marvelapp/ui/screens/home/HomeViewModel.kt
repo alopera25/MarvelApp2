@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: CharacterRepository) : ViewModel() {
-    private var currentPage = 0
-    private val pageSize = 20
 
     private val uiReady = MutableStateFlow(true)
 
@@ -31,12 +29,6 @@ class HomeViewModel(private val repository: CharacterRepository) : ViewModel() {
             initialValue = UiState(loading = true)
         )
 
-    fun fetchNextPage() {
-        viewModelScope.launch {
-            repository.fetchCharacters(currentPage * pageSize, pageSize)
-            currentPage++
-        }
-    }
 
     data class UiState(
         val loading: Boolean = false,

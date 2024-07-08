@@ -35,21 +35,18 @@ fun Navigation() {
     }
 
     NavHost(navController = navController, startDestination = NavScreen.Splash.route) {
+
         composable(NavScreen.Splash.route) {
             SplashScreen(navController, SplashViewModel()) {
             }
         }
 
-        composable<Home> {
-            val vm = viewModel { HomeViewModel(characterRepository) }
-            val state by vm.state.collectAsState()
-            val fetchNextPage = vm::fetchNextPage
+        composable(NavScreen.Home.route) {
             HomeScreen(
+                viewModel { HomeViewModel(characterRepository) },
                 onClick = { character ->
                     navController.navigate(NavScreen.Detail.createRoute(character.id!!))
-                },
-                fetchNextPage = fetchNextPage,
-                state = state
+                }
             )
         }
 
@@ -57,7 +54,8 @@ fun Navigation() {
             route = NavScreen.Detail.route,
             arguments = listOf(navArgument(NavArgs.CharacterId.key) { type = NavType.IntType })
         ) { backStackEntry ->
-            val characterId = requireNotNull(backStackEntry.arguments?.getInt(NavArgs.CharacterId.key))
+            val characterId =
+                requireNotNull(backStackEntry.arguments?.getInt(NavArgs.CharacterId.key))
             DetailScreen(
                 viewModel { DetailViewModel(characterRepository, characterId) },
                 onBack = { navController.popBackStack() })

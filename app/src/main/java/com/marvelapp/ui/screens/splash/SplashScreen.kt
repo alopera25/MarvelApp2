@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import com.marvelapp.R
 import com.marvelapp.ui.navigation.Home
+import com.marvelapp.ui.navigation.NavScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,7 +40,7 @@ fun SplashScreen(
         startAnimation = true
         delay(3000)
         onTimeout()
-        navController.navigate(Home)
+        navController.navigate(NavScreen.Home.route)
     }
 
     Splash(alpha = alphaAnim.value)
