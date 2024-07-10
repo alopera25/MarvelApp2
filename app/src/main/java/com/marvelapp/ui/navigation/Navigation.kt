@@ -1,9 +1,6 @@
 package com.marvelapp.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -27,12 +24,10 @@ fun Navigation() {
     val navController = rememberNavController()
     val app = LocalContext.current.applicationContext as App
 
-    val characterRepository = remember {
-        CharacterRepository(
-            CharacterRemoteDataSource(),
-            CharacterLocalDataSource(app.db.characterDao()),
-        )
-    }
+    val characterRepository= CharacterRepository(
+        CharacterRemoteDataSource(),
+        CharacterLocalDataSource(app.db.characterDao()),
+    )
 
     NavHost(navController = navController, startDestination = NavScreen.Splash.route) {
 

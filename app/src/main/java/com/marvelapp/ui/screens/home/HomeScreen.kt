@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,9 +68,9 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
-                items(state.characters, key = { it.id }) {
-                    CharacterItem(character = it) { onClick(it)}
-                }
+                itemsIndexed(state.characters, itemContent = { _, it ->
+                    CharacterItem(character = it) { onClick(it) }
+                })
             }
         }
     }
