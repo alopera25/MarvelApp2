@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -33,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.marvelapp.R
 import com.marvelapp.data.Character
-import com.marvelapp.ui.common.LoadingIndicator
+import com.marvelapp.ui.common.AcScaffold
 import com.marvelapp.ui.screens.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +44,9 @@ fun HomeScreen(
     val homeState = rememberHomeState()
 
     Screen {
-        Scaffold(
+        val state by vm.state.collectAsState()
+        AcScaffold(
+            state = state,
             topBar = {
                 TopAppBar(
                     title = { Text(text = stringResource(id = R.string.app_name)) },
@@ -54,13 +55,7 @@ fun HomeScreen(
             },
             modifier = Modifier.nestedScroll(homeState.scrollBehavior.nestedScrollConnection),
             contentWindowInsets = WindowInsets.safeDrawing,
-        ) { padding ->
-            val state by vm.state.collectAsState()
-
-            if (state.loading) {
-                LoadingIndicator()
-            }
-
+        ) { padding, characters ->
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(120.dp),
                 contentPadding = padding,
@@ -68,7 +63,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
-                itemsIndexed(state.characters, itemContent = { _, it ->
+                itemsIndexed(characters, itemContent = { _, it ->
                     CharacterItem(character = it) { onClick(it) }
                 })
             }

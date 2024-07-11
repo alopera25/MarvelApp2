@@ -2,12 +2,12 @@ package com.marvelapp.ui.screens.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.marvelapp.Result
 import com.marvelapp.data.Character
 import com.marvelapp.data.CharacterRepository
-import kotlinx.coroutines.flow.SharingStarted
+import com.marvelapp.ifSuccess
+import com.marvelapp.stateAsResultIn
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
@@ -15,21 +15,11 @@ class DetailViewModel(
     id: Int
 ) : ViewModel() {
 
-    val state: StateFlow<UiState> = repository.fetchCharacterById(id)
-        .map { UiState(character = it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = UiState(loading = true)
-        )
-
-    data class UiState(
-        val loading: Boolean = false,
-        val character: Character? = null
-    )
+    val state: StateFlow<Result<Character>> = repository.fetchCharacterById(id)
+        .stateAsResultIn(scope = viewModelScope)
 
     fun onFavoriteClicked() {
-        state.value.character?.let {
+        state.value.ifSuccess {
             viewModelScope.launch {
                 repository.toggleFavorite(it)
             }
