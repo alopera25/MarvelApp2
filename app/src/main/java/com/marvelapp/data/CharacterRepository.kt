@@ -2,40 +2,38 @@ package com.marvelapp.data
 
 import com.marvelapp.data.datasource.CharacterLocalDataSource
 import com.marvelapp.data.datasource.CharacterRemoteDataSource
-import com.marvelapp.data.datasource.remote.Comic
-import com.marvelapp.data.datasource.remote.Event
-import com.marvelapp.data.datasource.remote.Serie
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.transform
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
 
-class CharacterRepository (
+class CharacterRepository(
     private val characterRemoteDataSource: CharacterRemoteDataSource,
     private val localDataSource: CharacterLocalDataSource
-){
-    private val _characters = MutableStateFlow<List<Character>>(emptyList())
-    val characters: StateFlow<List<Character>> = _characters
-
-    suspend fun fetchCharacters(offset: Int, limit: Int) {
-        val newCharacters: List<Character> = characterRemoteDataSource.fetchCharacters(offset, limit) ?: return
-        _characters.update { it + newCharacters }
+) {
+    val characters: Flow<List<Character>> = localDataSource.character.onEach { localCharacters ->
+        if (localCharacters.isEmpty()) {
+            val remoteCharacters = characterRemoteDataSource.fetchCharacters(offset = 0, limit = 20)
+            localDataSource.saveCharacter(remoteCharacters!!)
+        }
     }
 
-    fun fetchCharacterById(id: Int): Flow<Character> =
-        localDataSource.fetchCharacterById(id).transform { localCharacter ->
-            val character = localCharacter ?: characterRemoteDataSource.fetchCharacterById(id)?.also { fetchedCharacter ->
-                if (fetchedCharacter != null) {
-                    localDataSource.saveCharacter(listOf(fetchedCharacter))
-                }
+    /* private val _characters = MutableStateFlow<List<Character>>(emptyList())
+
+     suspend fun fetchCharacters(offset: Int, limit: Int) {
+         val newCharacters: List<Character> = characterRemoteDataSource.fetchCharacters(offset, limit) ?: return
+         _characters.update { it + newCharacters }
+     }*/
+
+    fun fetchCharacterById(id: Int): Flow<Character> = localDataSource.fetchCharacterById(id)
+        .onEach { character ->
+            if (character == null) {
+                val remoteCharacter = characterRemoteDataSource.fetchCharacterById(id)
+                localDataSource.saveCharacter(listOf(remoteCharacter!!))
             }
-            character?.let { emit(it) }
         }
+        .filterNotNull()
 
-    suspend fun fetchComicDetails(comicId: Int): Comic? = characterRemoteDataSource.fetchComicDetails(comicId)
-
-    suspend fun fetchSerieDetails(serieId: Int): Serie? = characterRemoteDataSource.fetchSerieDetails(serieId)
-
-    suspend fun fetchEventDetails(eventId: Int): Event? = characterRemoteDataSource.fetchEventDetails(eventId)
+    suspend fun toggleFavorite(character: Character) {
+        localDataSource.saveCharacter(listOf(character.copy(isFavorite = !character.isFavorite)))
+    }
 }

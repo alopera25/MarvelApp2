@@ -4,33 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marvelapp.data.Character
 import com.marvelapp.data.CharacterRepository
-import kotlinx.coroutines.flow.SharingStarted
+import com.marvelapp.stateAsResultIn
+import com.marvelapp.Result
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 
-class HomeViewModel(private val repository: CharacterRepository) : ViewModel() {
-    private var currentPage = 0
-    private val pageSize = 20
+class HomeViewModel(repository: CharacterRepository) : ViewModel() {
 
-    val state: StateFlow<UiState> = repository.characters
-        .map { UiState(characters = it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = UiState(loading = true)
-        )
+    private val uiReady = MutableStateFlow(true)
 
-    fun fetchNextPage() {
-        viewModelScope.launch {
-            repository.fetchCharacters(currentPage * pageSize, pageSize)
-            currentPage++
-        }
-    }
-
-    data class UiState(
-        val loading: Boolean = false,
-        val characters: List<Character> = emptyList()
-    )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state: StateFlow<Result<List<Character>>> = uiReady
+        .filter { it }
+        .flatMapLatest { repository.characters }
+        .stateAsResultIn(viewModelScope)
 }
+
