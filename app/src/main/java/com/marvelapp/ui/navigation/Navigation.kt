@@ -18,6 +18,9 @@ import com.marvelapp.ui.screens.home.HomeScreen
 import com.marvelapp.ui.screens.home.HomeViewModel
 import com.marvelapp.ui.screens.splash.SplashScreen
 import com.marvelapp.ui.screens.splash.SplashViewModel
+import com.marvelapp.usecases.FetchCharactersUseCase
+import com.marvelapp.usecases.FindCharacterByIdUseCase
+import com.marvelapp.usecases.ToggleFavoriteUseCase
 
 @Composable
 fun Navigation() {
@@ -38,7 +41,7 @@ fun Navigation() {
 
         composable(NavScreen.Home.route) {
             HomeScreen(
-                viewModel { HomeViewModel(characterRepository) },
+                viewModel { HomeViewModel(FetchCharactersUseCase(characterRepository)) },
                 onClick = { character ->
                     navController.navigate(NavScreen.Detail.createRoute(character.id!!))
                 }
@@ -52,7 +55,13 @@ fun Navigation() {
             val characterId =
                 requireNotNull(backStackEntry.arguments?.getInt(NavArgs.CharacterId.key))
             DetailScreen(
-                viewModel { DetailViewModel(characterRepository, characterId) },
+                viewModel {
+                    DetailViewModel(
+                        characterId,
+                        FindCharacterByIdUseCase(characterRepository),
+                        ToggleFavoriteUseCase(characterRepository)
+                    )
+                },
                 onBack = { navController.popBackStack() })
         }
     }
