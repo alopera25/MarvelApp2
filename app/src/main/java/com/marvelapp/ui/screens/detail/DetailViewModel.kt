@@ -7,21 +7,24 @@ import com.marvelapp.data.Character
 import com.marvelapp.data.CharacterRepository
 import com.marvelapp.ifSuccess
 import com.marvelapp.stateAsResultIn
+import com.marvelapp.usecases.FindCharacterByIdUseCase
+import com.marvelapp.usecases.ToggleFavoriteUseCase
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
-    private val repository: CharacterRepository,
-    id: Int
+    id: Int,
+    findMovieByIdUseCase: FindCharacterByIdUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ViewModel() {
 
-    val state: StateFlow<Result<Character>> = repository.fetchCharacterById(id)
+    val state: StateFlow<Result<Character>> = findMovieByIdUseCase(id)
         .stateAsResultIn(scope = viewModelScope)
 
     fun onFavoriteClicked() {
         state.value.ifSuccess {
             viewModelScope.launch {
-                repository.toggleFavorite(it)
+                toggleFavoriteUseCase(it)
             }
         }
     }
