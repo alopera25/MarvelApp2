@@ -1,11 +1,11 @@
-package com.marvelapp.data
+package com.marvelapp.data.datasource.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.marvelapp.data.datasource.remote.Thumbnail
 
 @Entity
-data class Character(
+data class DbCharacter(
     @PrimaryKey(autoGenerate = true)
     val id: Int?,
     val name: String?,
@@ -13,5 +13,3 @@ data class Character(
     val thumbnail: Thumbnail?,
     val isFavorite: Boolean
 )
-
-

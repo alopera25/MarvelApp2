@@ -2,7 +2,6 @@ package com.marvelapp.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.marvelapp.data.Character
 import com.marvelapp.stateAsResultIn
 import com.marvelapp.Result
 import com.marvelapp.usecases.FetchCharactersUseCase

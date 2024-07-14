@@ -7,7 +7,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.marvelapp.Result
-import com.marvelapp.data.Character
+import com.marvelapp.domain.Character
 
 @OptIn(ExperimentalMaterial3Api::class)
 class DetailState(

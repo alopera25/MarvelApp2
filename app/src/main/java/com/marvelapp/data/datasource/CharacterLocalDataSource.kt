@@ -1,6 +1,6 @@
 package com.marvelapp.data.datasource
 
-import com.marvelapp.data.Character
+import com.marvelapp.domain.Character
 import com.marvelapp.data.datasource.database.CharacterDao
 
 class CharacterLocalDataSource(private val characterDao: CharacterDao) {

@@ -31,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.marvelapp.R
-import com.marvelapp.data.Character
+import com.marvelapp.domain.Character
 import com.marvelapp.ui.common.AcScaffold
 import com.marvelapp.ui.screens.Screen
 

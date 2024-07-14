@@ -2,6 +2,7 @@ package com.marvelapp.data
 
 import com.marvelapp.data.datasource.CharacterLocalDataSource
 import com.marvelapp.data.datasource.CharacterRemoteDataSource
+import com.marvelapp.domain.Character
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach

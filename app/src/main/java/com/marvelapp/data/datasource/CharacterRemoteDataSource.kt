@@ -1,6 +1,6 @@
 package com.marvelapp.data.datasource
 
-import com.marvelapp.data.Character
+import com.marvelapp.domain.Character
 import com.marvelapp.data.datasource.remote.CharactersClient
 import com.marvelapp.data.datasource.remote.RemoteCharacter
 import kotlinx.coroutines.Dispatchers
